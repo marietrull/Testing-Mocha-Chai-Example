@@ -46,6 +46,41 @@ describe('Books API', () => {
       })
     })
 
-  }) // end of get
+  }) // end of get test
+
+  describe('/Post Book', () => {
+    // our database shouldn't update without compeleted parameters
+    it('it should not POST a book without all required Parameters', (done) => {
+      // This is the object we are sending to the server for testing 
+      // This should NOT work because we don't have all of the required params
+      const book = {
+        title: 'Cats Cradle',
+        author: 'Kurty',
+        year: 1950
+      }
+
+      chai.request(server)
+      .post('/book')
+      .send(book)
+      .end((err, res) => {
+        // this tells us that the test itself ran successfully 
+        // not the actual result of the test. 
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        // check the errors property
+        res.body.should.have.property('errors');
+        // go into the error object
+        // check pages property of the error
+        res.body.errors.should.have.property('pages')
+        // check the pages property for error kind
+        res.body.errors.pages.should.have.property('kind').eql('required');
+
+        done();
+        
+      })
+      
+    })
+    
+  }) // end of post test
 
 }) // end of Books API
